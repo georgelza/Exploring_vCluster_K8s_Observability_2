@@ -67,26 +67,7 @@ Filebeat                    Filebeat is a lightweight, open-source log shipper w
                             high-volume, real-time data ingestion while ensuring log continuity.
 ```
 
-<img src="blog-doc/diagrams/SuperLabv5.0.png" alt="Our Build- Part 2" width="450" height="350">
-
-
-### Previous (Part 1) Components -  Breakdown
-
-```
-Component                   What It Does
-
-Prometheus                  Scrapes metrics from all workloads, nodes, and Kubernetes internals
-Alertmanager                Handles alerts triggered by Prometheus rules
-Thanos                      Provides long-term metric storage and a unified query layer across Prometheus instances
-RustFS                      S3-compatible object store that backs Thanos for durable metric retention
-Grafana                     Dashboards and visualization — connects to both Prometheus and Thanos as data sources
-Traefik                     Ingress proxy routing all UIs through a single entry point on port 8080
-```
-
-
-<img src="blog-doc/diagrams/SuperLabv4.0.png" alt="Previous Build - Part 1" width="450" height="350">
-
-
+<img src="blog-doc/diagrams/SuperLabv4.1.png" alt="Our Build- Part 2" width="600" height="700">
 
 ### Three Demo Applications
 
@@ -95,7 +76,16 @@ As per the previous edition, the stack includes three applications that generate
 The little surprise, what we did not mention at the time was that these example applications already exposed structured log messages as per below.
 
 ```json
-{"app": "python-prometheus-demo", "module":"main", "level": "INFO", "ts": "2025-01-01T10:00:00Z", "event": "startup", "sleep_min": 1.0, "sleep_max": 5.0, "max_run": "unlimited"}
+{ 
+  "app": "python-prometheus-demo", 
+  "module":"main", 
+  "level": "INFO", 
+  "ts": "2025-01-01T10:00:00Z", 
+  "event": "startup", 
+  "sleep_min": 1.0, 
+  "sleep_max": 5.0, 
+  "max_run": "unlimited"
+}
 ```
 
 
@@ -110,7 +100,7 @@ This project is part of a series building up a complete local Kubernetes develop
 
 3. [Observability Stack, Part 1](https://github.com/georgelza/Exploring_vCluster_K8s_Observability_1.git) — Metrics, dashboards, and long-term storage
 
-4. Observability Stack, Part 2 (this post) — Log analytics with Elasticsearch
+4. [Observability Stack, Part 2](https://github.com/georgelza/Exploring_vCluster_K8s_Observability_2.git) (this post) — Log analytics with Elasticsearch
 
 By the end of the series, you have a local environment with application hosting, ingress routing, metrics collection, dashboarding, alerting, long-term metric storage, and log analytics. That’s a genuinely useful development platform — and it all runs on your laptop.
 
@@ -136,17 +126,20 @@ The deployment has been divided into 2 sections, Core deployment and the Log Ana
 
 For the complete step-by-step walkthrough, start with  `loganalytics/README.md`.
 
-- The Core is our Generic vCluster/Kubernetes Cluster and our Traefik Application Proxy. see `loganalytics/Deploy_core.md` - Ths was already build during our previous blog, so if you have that deployed you can simply continue. 
+1. The Core is our Generic vCluster/Kubernetes Cluster and our Traefik Application Proxy. see `loganalytics/Deploy_core.md` - Ths was already build during our previous blog, so if you have that deployed you can simply continue. 
   
-- The Log Analytics deployment deploys our stack as per above onto our core Kubernetes cluster. see `loganalytics/Deploy_analytics.md`
+2. The Metric stack/deployment as we covered in our previous blog and,
+   
+3. The Log Analytics deployment deploys our stack as per above onto our core Kubernetes cluster. see `loganalytics/Deploy_analytics.md`
   
 See `mv-vc1/*` for screengrabs of each step executed and terminal output.
 
 
 ## Summary / Conclusion
 
-.....
+So, Between the 2 blogs we've build a multi node Kubernetes cluster on vCluster, we've deployed a full metric collection stack and log analytics stack. We also have example applications showing how to "instrument" application, in 3 common development languages.
 
+A pretty complete, locally hosted development environment for any developer.
 
 
 ### vCluster Project Pages
