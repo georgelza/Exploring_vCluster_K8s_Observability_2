@@ -1,0 +1,359 @@
+---
+# ─────────────────────────────────────────────────────────────────────────────
+# filebeat-config-full.yaml
+#
+# THE DEPLOYED FILE.  Apply this to the cluster.
+#
+# Per-app blocks are sourced from apps/filebeat-app-<name>.yaml.
+# When adding a new app:
+#   1. Create apps/filebeat-app-<name>.yaml from apps/filebeat-app-TEMPLATE.yaml
+#   2. Paste the TEMPLATE BLOCK into the APPS section below (keep alphabetical)
+#   3. Add a Kibana bootstrap curl call to kibana-bootstrap-job.yaml
+#   4. kubectl apply -f filebeat-config-full.yaml
+#   5. kubectl rollout restart daemonset/filebeat -n logging
+#
+# Registered apps:
+#   [1] python-prometheus-demo   → filebeat-python-prometheus-demo-*
+#   [2] java-prometheus-demo     → filebeat-java-prometheus-demo-*
+#   [3] golang-prometheus-demo   → filebeat-golang-prometheus-demo-*
+#       (catch-all)              → filebeat-generic-*
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── RBAC ─────────────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: filebeat
+  namespace: logging
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: filebeat
+rules:
+  - apiGroups: [""]
+    resources: [namespaces, pods, nodes]
+    verbs: [get, watch, list]
+  - apiGroups: [apps]
+    resources: [replicasets]
+    verbs: [get, watch, list]
+  - apiGroups: [batch]
+    resources: [jobs]
+    verbs: [get, watch, list]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: filebeat
+subjects:
+  - kind: ServiceAccount
+    name: filebeat
+    namespace: logging
+roleRef:
+  kind: ClusterRole
+  name: filebeat
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# ── ConfigMap ─────────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filebeat-config
+  namespace: logging
+  labels:
+    app: filebeat
+    component: config
+data:
+  filebeat.yml: |
+
+    # ── Autodiscovery ──────────────────────────────────────────────────────────
+    filebeat.autodiscover:
+      providers:
+        - type: kubernetes
+          node: ${NODE_NAME}
+          hints.enabled: false
+
+          templates:
+
+            # ================================================================
+            # ████████████████████  APPS SECTION  ████████████████████████████
+            # ================================================================
+            # Each block is self-contained and sourced from apps/ directory.
+            # ================================================================
+
+            # ── START APP: python-prometheus-demo ──────────────────────────
+            - condition:
+                contains:
+                  kubernetes.pod.name: "python-prometheus-demo"                  
+              config:
+                - type: container
+                  paths:
+                    - /var/log/containers/*${data.kubernetes.container.id}.log
+                  tags: ["python-prometheus-demo"]
+                  fields_under_root: true
+                  fields:
+                    app_module: python-prometheus-demo
+                    log_stream: application
+                  processors:
+                    - decode_json_fields:
+                        fields: ["message"]
+                        target: "parsed"
+                        overwrite_keys: false
+                        add_error_key: true
+                    - rename:
+                        fields:
+                          - {from: "parsed.app",       to: "app"}
+                          - {from: "parsed.module",    to: "module"}
+                          - {from: "parsed.level",     to: "log.level"}
+                          - {from: "parsed.ts",        to: "@timestamp"}
+                          - {from: "parsed.event",     to: "event.action"}
+                          - {from: "parsed.sleep_min", to: "app.sleep_min"}
+                          - {from: "parsed.sleep_max", to: "app.sleep_max"}
+                          - {from: "parsed.max_run",   to: "app.max_run"}
+                        ignore_missing: true
+                        fail_on_error: false
+                    - drop_fields:
+                        fields: ["parsed"]
+                        ignore_missing: true
+                    - script:
+                        lang: javascript
+                        id: uppercase_level_python
+                        source: >
+                          function process(event) {
+                            var lvl = event.Get("log.level");
+                            if (lvl) { event.Put("log.level", lvl.toUpperCase()); }
+                          }
+                  index: "filebeat-python-prometheus-demo-%{+yyyy.MM.dd}"
+            # ── END APP: python-prometheus-demo ────────────────────────────
+
+            # ── START APP: java-prometheus-demo ────────────────────────────
+            # - condition:
+            #     contains:
+            #       kubernetes.pod.name: "java-prometheus-demo"               
+            #   config:
+            #     - type: container
+            #       paths:
+            #         - /var/log/containers/*${data.kubernetes.container.id}.log
+            #       tags: ["java-prometheus-demo"]
+            #       fields_under_root: true
+            #       fields:
+            #         app_module: java-prometheus-demo
+            #         log_stream: application
+            #       processors:
+            #         - decode_json_fields:
+            #             fields: ["message"]
+            #             target: "parsed"
+            #             overwrite_keys: false
+            #             add_error_key: true
+            #         - rename:
+            #             fields:
+            #               - {from: "parsed.app",       to: "app"}
+            #               - {from: "parsed.module",    to: "module"}
+            #               - {from: "parsed.level",     to: "log.level"}
+            #               - {from: "parsed.ts",        to: "@timestamp"}
+            #               - {from: "parsed.event",     to: "event.action"}
+            #               - {from: "parsed.sleep_min", to: "app.sleep_min"}
+            #               - {from: "parsed.sleep_max", to: "app.sleep_max"}
+            #               - {from: "parsed.max_run",   to: "app.max_run"}
+            #               # ── Uncomment if your Java logger adds these ─────
+            #               # - {from: "parsed.logger_name", to: "log.logger"}
+            #               # - {from: "parsed.thread_name", to: "process.thread.name"}
+            #               # - {from: "parsed.stack_trace", to: "error.stack_trace"}
+            #             ignore_missing: true
+            #             fail_on_error: false
+            #         - drop_fields:
+            #             fields: ["parsed"]
+            #             ignore_missing: true
+            #         - script:
+            #             lang: javascript
+            #             id: uppercase_level_java
+            #             source: >
+            #               function process(event) {
+            #                 var lvl = event.Get("log.level");
+            #                 if (lvl) { event.Put("log.level", lvl.toUpperCase()); }
+            #               }
+            #       index: "filebeat-java-prometheus-demo-%{+yyyy.MM.dd}"
+            # # ── END APP: java-prometheus-demo ──────────────────────────────
+
+            # # ── START APP: golang-prometheus-demo ──────────────────────────
+              # - condition:
+              #     contains:
+              #       kubernetes.pod.name: "golang-prometheus-demo"               
+            #   config:
+            #     - type: container
+            #       paths:
+            #         - /var/log/containers/*${data.kubernetes.container.id}.log
+            #       tags: ["golang-prometheus-demo"]
+            #       fields_under_root: true
+            #       fields:
+            #         app_module: golang-prometheus-demo
+            #         log_stream: application
+            #       processors:
+            #         - decode_json_fields:
+            #             fields: ["message"]
+            #             target: "parsed"
+            #             overwrite_keys: false
+            #             add_error_key: true
+            #         - rename:
+            #             fields:
+            #               - {from: "parsed.app",       to: "app"}
+            #               - {from: "parsed.module",    to: "module"}
+            #               - {from: "parsed.level",     to: "log.level"}
+            #               - {from: "parsed.ts",        to: "@timestamp"}
+            #               - {from: "parsed.event",     to: "event.action"}
+            #               - {from: "parsed.sleep_min", to: "app.sleep_min"}
+            #               - {from: "parsed.sleep_max", to: "app.sleep_max"}
+            #               - {from: "parsed.max_run",   to: "app.max_run"}
+            #             ignore_missing: true
+            #             fail_on_error: false
+            #         - drop_fields:
+            #             fields: ["parsed"]
+            #             ignore_missing: true
+            #         - script:
+            #             lang: javascript
+            #             id: uppercase_level_golang
+            #             source: >
+            #               function process(event) {
+            #                 var lvl = event.Get("log.level");
+            #                 if (lvl) { event.Put("log.level", lvl.toUpperCase()); }
+            #               }
+            #       index: "filebeat-golang-prometheus-demo-%{+yyyy.MM.dd}"
+            # ── END APP: golang-prometheus-demo ────────────────────────────
+
+            # ================================================================
+            # ████████████████████  END APPS SECTION  ████████████████████████
+            # ================================================================
+
+            # ── Catch-all: every pod NOT matched above ──────────────────────
+            # Logs land in filebeat-generic-* without JSON parsing.
+            # This ensures no pod logs are silently dropped.
+            - condition:
+                and:
+                  - not:
+                      contains:
+                        kubernetes.pod.name: "python-prometheus-demo"
+                  # - not:
+                  #     contains:
+                  #       kubernetes.pod.name: "java-prometheus-demo"
+                  # - not:
+                  #     contains:
+                  #       kubernetes.pod.name: "golang-prometheus-demo"
+              config:
+                - type: container
+                  paths:
+                    - /var/log/containers/*${data.kubernetes.container.id}.log
+                  fields_under_root: true
+                  fields:
+                    log_stream: generic
+                  index: "filebeat-generic-%{+yyyy.MM.dd}"
+
+    # ── Global processors (run after per-input processors) ────────────────────
+    processors:
+      - add_cloud_metadata: ~
+      - add_host_metadata: ~
+      - add_kubernetes_metadata:
+          host: ${NODE_NAME}
+          matchers:
+            - logs_path:
+                logs_path: "/var/log/containers/"
+
+    # ── Output ────────────────────────────────────────────────────────────────
+    output.elasticsearch:
+      hosts: ["http://elasticsearch.logging.svc.cluster.local:9200"]
+      index: "filebeat-generic-%{+yyyy.MM.dd}"
+
+    setup.template.name: "filebeat"
+    setup.template.pattern: "filebeat-*"
+    setup.template.enabled: false
+    setup.ilm.enabled: false
+
+    # Explicitly disable data streams
+    setup.template.settings:
+      index.number_of_shards: 1
+      index.number_of_replicas: 0
+
+    setup.kibana:
+      host: "http://kibana.logging.svc.cluster.local:5601"
+      path: "/kibana"
+
+    logging.level: info
+    logging.to_files: false
+
+
+---
+# ── DaemonSet ─────────────────────────────────────────────────────────────────
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: filebeat
+  namespace: logging
+  labels:
+    app: filebeat
+spec:
+  selector:
+    matchLabels:
+      app: filebeat
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: filebeat
+      annotations:
+        # Force a rolling restart when the ConfigMap changes by updating
+        # this value: kubectl patch ds filebeat -n logging -p '{"spec":{"template":{"metadata":{"annotations":{"configmap-version":"2"}}}}}'
+        configmap-version: "2"
+    spec:
+      serviceAccountName: filebeat
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+        - name: filebeat
+          image: docker.elastic.co/beats/filebeat:8.13.4
+          imagePullPolicy: IfNotPresent
+          args: ["-c", "/etc/filebeat.yml", "-e"]
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - name: config
+              mountPath: /etc/filebeat.yml
+              subPath: filebeat.yml
+              readOnly: true
+            - name: varlog
+              mountPath: /var/log
+              readOnly: true
+            - name: varlibdockercontainers
+              mountPath: /var/lib/docker/containers
+              readOnly: true
+            - name: data
+              mountPath: /usr/share/filebeat/data
+      volumes:
+        - name: config
+          configMap:
+            name: filebeat-config
+            defaultMode: 0640
+        - name: varlog
+          hostPath:
+            path: /var/log
+        - name: varlibdockercontainers
+          hostPath:
+            path: /var/lib/docker/containers
+        - name: data
+          emptyDir: {}

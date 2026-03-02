@@ -1,0 +1,29 @@
+# ServiceMonitor – used when Prometheus Operator (kube-prometheus-stack) is present.
+# If you are using plain Prometheus with annotation-based pod discovery,
+# you can skip this file – the annotations in the Deployment are sufficient.
+#
+# Apply only if:
+#   kubectl api-resources | grep servicemonitors
+# returns a result.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: java-prometheus-demo
+  namespace: prometheus-demo
+  labels:
+    app.kubernetes.io/name: java-prometheus-demo
+    app.kubernetes.io/component: monitoring
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: java-prometheus-demo
+  namespaceSelector:
+    matchNames:
+      - prometheus-demo
+  endpoints:
+    - port: metrics
+      path: /metrics
+      scheme: http
+      interval: 15s
+      scrapeTimeout: 10s

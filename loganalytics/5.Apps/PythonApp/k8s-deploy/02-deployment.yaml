@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-prometheus-demo
+  namespace: prometheus-demo
+  labels:
+    app.kubernetes.io/name: python-prometheus-demo
+    app.kubernetes.io/component: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: python-prometheus-demo
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: python-prometheus-demo
+        app.kubernetes.io/component: app
+      annotations:
+        # ── Prometheus auto-discovery scrape annotations ─────────────────────
+        # These are read by the Prometheus `kubernetes-pods` scrape job.
+        # Requires Prometheus to be configured with the standard pod-annotation
+        # relabelling rules (shipped by default in kube-prometheus-stack).
+        prometheus.io/scrape: "true"
+        prometheus.io/port:   "8000"
+        prometheus.io/path:   "/metrics"
+        prometheus.io/scheme: "http"
+    spec:
+      # ── Security context ──────────────────────────────────────────────────
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+
+      containers:
+        - name: python-prometheus-demo
+          # Full image path: {REPO_NAME}/python-prometheus-demo:latest
+          # Set REPO_NAME in .env and run: make build-push before applying
+          image: georgelza/python-prometheus-demo:latest
+          imagePullPolicy: Always
+
+          ports:
+            - name: metrics          # named port – referenced by the Service
+              containerPort: 8000
+              protocol: TCP
+
+          # ── ConfigMap injected as env vars ──────────────────────────────
+          envFrom:
+            - configMapRef:
+                name: python-prometheus-demo-config
+
+          # ── Resource requests & limits ──────────────────────────────────
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "200m"
+              memory: "128Mi"
+
+          # ── Health probes ────────────────────────────────────────────────
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            failureThreshold: 3
+
+          # ── Container security context ───────────────────────────────────
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]

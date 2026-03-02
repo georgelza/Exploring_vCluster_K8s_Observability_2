@@ -1,0 +1,71 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# FILEBEAT APP FRAGMENT: python-prometheus-demo
+# File: apps/filebeat-app-python-prometheus-demo.yaml
+#
+# Log format:
+#   {
+#     "app":       "python-prometheus-demo",
+#     "module":    "main",
+#     "level":     "INFO",
+#     "ts":        "2025-01-01T10:00:00Z",
+#     "event":     "startup",
+#     "sleep_min": 1.0,
+#     "sleep_max": 5.0,
+#     "max_run":   "unlimited"
+#   }
+#
+# Target index: filebeat-python-prometheus-demo-YYYY.MM.dd
+# Match label:  app.kubernetes.io/name: python-prometheus-demo
+#
+# To register: paste the TEMPLATE BLOCK below into the
+#              filebeat-config-full.yaml templates: section.
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# ┌─────────────────────────────────────────────────────────────────────────┐
+# │  TEMPLATE BLOCK – copy everything between the START / END markers       │
+# └─────────────────────────────────────────────────────────────────────────┘
+#
+# # ── START APP: python-prometheus-demo ──────────────────────────────────────
+#             - condition:
+#                 equals:
+#                   kubernetes.labels.app_kubernetes_io/name: "python-prometheus-demo"
+#               config:
+#                 - type: container
+#                   paths:
+#                     - /var/log/containers/*${data.kubernetes.container.id}.log
+#                   tags: ["python-prometheus-demo"]
+#                   fields_under_root: true
+#                   fields:
+#                     app_module: python-prometheus-demo
+#                     log_stream: application
+#                   processors:
+#                     - decode_json_fields:
+#                         fields: ["message"]
+#                         target: "parsed"
+#                         overwrite_keys: false
+#                         add_error_key: true
+#                     - rename:
+#                         fields:
+#                           - {from: "parsed.app",       to: "app"}
+#                           - {from: "parsed.module",    to: "module"}
+#                           - {from: "parsed.level",     to: "log.level"}
+#                           - {from: "parsed.ts",        to: "@timestamp"}
+#                           - {from: "parsed.event",     to: "event.action"}
+#                           - {from: "parsed.sleep_min", to: "app.sleep_min"}
+#                           - {from: "parsed.sleep_max", to: "app.sleep_max"}
+#                           - {from: "parsed.max_run",   to: "app.max_run"}
+#                         ignore_missing: true
+#                         fail_on_error: false
+#                     - drop_fields:
+#                         fields: ["parsed"]
+#                         ignore_missing: true
+#                     - script:
+#                         lang: javascript
+#                         id: uppercase_level_python
+#                         source: >
+#                           function process(event) {
+#                             var lvl = event.Get("log.level");
+#                             if (lvl) { event.Put("log.level", lvl.toUpperCase()); }
+#                           }
+#                   index: "filebeat-python-prometheus-demo-%{+yyyy.MM.dd}"
+# # ── END APP: python-prometheus-demo ────────────────────────────────────────

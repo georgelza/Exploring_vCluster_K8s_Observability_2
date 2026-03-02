@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-prometheus-demo
+  namespace: prometheus-demo
+  labels:
+    app.kubernetes.io/name: java-prometheus-demo
+    app.kubernetes.io/component: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: java-prometheus-demo
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: java-prometheus-demo
+        app.kubernetes.io/component: app
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port:   "8000"
+        prometheus.io/path:   "/metrics"
+        prometheus.io/scheme: "http"
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+
+      containers:
+        - name: java-prometheus-demo
+          # Full image path: {REPO_NAME}/java-prometheus-demo:latest
+          # Set REPO_NAME in .env and run: make build-push before applying
+          image: REPO_NAME/java-prometheus-demo:latest
+          imagePullPolicy: Always
+
+          ports:
+            - name: metrics
+              containerPort: 8000
+              protocol: TCP
+
+          envFrom:
+            - configMapRef:
+                name: java-prometheus-demo-config
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 8
+            periodSeconds: 10
+            failureThreshold: 3
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: golang-prometheus-demo-config
+  namespace: prometheus-demo
+  labels:
+    app.kubernetes.io/name: golang-prometheus-demo
+    app.kubernetes.io/component: config
+data:
+  # ── Application identity ────────────────────────────────────────────────────
+  APP_NAME: "golang-prometheus-demo"
+
+  # ── Sleep bounds (seconds; floats accepted) ─────────────────────────────────
+  SLEEP_MIN: "1"
+  SLEEP_MAX: "5"
+
+  # ── Loop cap ────────────────────────────────────────────────────────────────
+  # Set to a positive integer to limit total iterations.
+  # Leave empty ("") for a continuous / unlimited run.
+  MAX_RUN: ""
+
+  # ── Metrics endpoint ────────────────────────────────────────────────────────
+  METRICS_PORT: "8000"

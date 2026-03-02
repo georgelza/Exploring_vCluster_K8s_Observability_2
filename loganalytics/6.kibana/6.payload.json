@@ -1,0 +1,334 @@
+{
+  "@timestamp": [
+    "2026-03-01T13:04:27.113Z"
+  ],
+  "agent.ephemeral_id": [
+    "ee380ebe-1571-4c3c-8c80-55c0f4e159d4"
+  ],
+  "agent.ephemeral_id.keyword": [
+    "ee380ebe-1571-4c3c-8c80-55c0f4e159d4"
+  ],
+  "agent.id": [
+    "f779204a-7b7a-4aab-b2fe-e813d19b14bb"
+  ],
+  "agent.id.keyword": [
+    "f779204a-7b7a-4aab-b2fe-e813d19b14bb"
+  ],
+  "agent.name": [
+    "filebeat-xcsj6"
+  ],
+  "agent.name.keyword": [
+    "filebeat-xcsj6"
+  ],
+  "agent.type": [
+    "filebeat"
+  ],
+  "agent.type.keyword": [
+    "filebeat"
+  ],
+  "agent.version": [
+    "8.13.4"
+  ],
+  "agent.version.keyword": [
+    "8.13.4"
+  ],
+  "app": [
+    "python-prometheus-demo"
+  ],
+  "app_module": [
+    "python-prometheus-demo"
+  ],
+  "app_module.keyword": [
+    "python-prometheus-demo"
+  ],
+  "app.keyword": [
+    "python-prometheus-demo"
+  ],
+  "container.id": [
+    "abf945c2b1f3a6109e22f72ed409e0b4031cf756f78fac3cfe93a50e10bc60ea"
+  ],
+  "container.id.keyword": [
+    "abf945c2b1f3a6109e22f72ed409e0b4031cf756f78fac3cfe93a50e10bc60ea"
+  ],
+  "container.image.name": [
+    "georgelza/python-prometheus-demo:latest"
+  ],
+  "container.image.name.keyword": [
+    "georgelza/python-prometheus-demo:latest"
+  ],
+  "container.runtime": [
+    "containerd"
+  ],
+  "container.runtime.keyword": [
+    "containerd"
+  ],
+  "ecs.version": [
+    "8.0.0"
+  ],
+  "ecs.version.keyword": [
+    "8.0.0"
+  ],
+  "event.action": [
+    "loop_tick"
+  ],
+  "event.action.keyword": [
+    "loop_tick"
+  ],
+  "host.architecture": [
+    "aarch64"
+  ],
+  "host.architecture.keyword": [
+    "aarch64"
+  ],
+  "host.containerized": [
+    false
+  ],
+  "host.hostname": [
+    "filebeat-xcsj6"
+  ],
+  "host.hostname.keyword": [
+    "filebeat-xcsj6"
+  ],
+  "host.ip": [
+    "10.244.2.22",
+    "fe80::340e:4ff:fe22:217f"
+  ],
+  "host.ip.keyword": [
+    "10.244.2.22",
+    "fe80::340e:4ff:fe22:217f"
+  ],
+  "host.mac": [
+    "36-0E-04-22-21-7F"
+  ],
+  "host.mac.keyword": [
+    "36-0E-04-22-21-7F"
+  ],
+  "host.name": [
+    "filebeat-xcsj6"
+  ],
+  "host.name.keyword": [
+    "filebeat-xcsj6"
+  ],
+  "host.os.codename": [
+    "focal"
+  ],
+  "host.os.codename.keyword": [
+    "focal"
+  ],
+  "host.os.family": [
+    "debian"
+  ],
+  "host.os.family.keyword": [
+    "debian"
+  ],
+  "host.os.kernel": [
+    "6.12.69-linuxkit"
+  ],
+  "host.os.kernel.keyword": [
+    "6.12.69-linuxkit"
+  ],
+  "host.os.name": [
+    "Ubuntu"
+  ],
+  "host.os.name.keyword": [
+    "Ubuntu"
+  ],
+  "host.os.platform": [
+    "ubuntu"
+  ],
+  "host.os.platform.keyword": [
+    "ubuntu"
+  ],
+  "host.os.type": [
+    "linux"
+  ],
+  "host.os.type.keyword": [
+    "linux"
+  ],
+  "host.os.version": [
+    "20.04.6 LTS (Focal Fossa)"
+  ],
+  "host.os.version.keyword": [
+    "20.04.6 LTS (Focal Fossa)"
+  ],
+  "input.type": [
+    "container"
+  ],
+  "input.type.keyword": [
+    "container"
+  ],
+  "kubernetes.container.name": [
+    "python-prometheus-demo"
+  ],
+  "kubernetes.container.name.keyword": [
+    "python-prometheus-demo"
+  ],
+  "kubernetes.labels.app_kubernetes_io/component": [
+    "app"
+  ],
+  "kubernetes.labels.app_kubernetes_io/component.keyword": [
+    "app"
+  ],
+  "kubernetes.labels.app_kubernetes_io/name": [
+    "python-prometheus-demo"
+  ],
+  "kubernetes.labels.app_kubernetes_io/name.keyword": [
+    "python-prometheus-demo"
+  ],
+  "kubernetes.labels.pod-template-hash": [
+    "5b45684f9"
+  ],
+  "kubernetes.labels.pod-template-hash.keyword": [
+    "5b45684f9"
+  ],
+  "kubernetes.namespace": [
+    "prometheus-demo"
+  ],
+  "kubernetes.namespace_labels.app_kubernetes_io/name": [
+    "prometheus-demo"
+  ],
+  "kubernetes.namespace_labels.app_kubernetes_io/name.keyword": [
+    "prometheus-demo"
+  ],
+  "kubernetes.namespace_labels.kubernetes_io/metadata_name": [
+    "prometheus-demo"
+  ],
+  "kubernetes.namespace_labels.kubernetes_io/metadata_name.keyword": [
+    "prometheus-demo"
+  ],
+  "kubernetes.namespace_uid": [
+    "7955792b-fdde-400f-8000-a6ad98a16aba"
+  ],
+  "kubernetes.namespace_uid.keyword": [
+    "7955792b-fdde-400f-8000-a6ad98a16aba"
+  ],
+  "kubernetes.namespace.keyword": [
+    "prometheus-demo"
+  ],
+  "kubernetes.node.hostname": [
+    "worker-1"
+  ],
+  "kubernetes.node.hostname.keyword": [
+    "worker-1"
+  ],
+  "kubernetes.node.labels.beta_kubernetes_io/arch": [
+    "arm64"
+  ],
+  "kubernetes.node.labels.beta_kubernetes_io/arch.keyword": [
+    "arm64"
+  ],
+  "kubernetes.node.labels.beta_kubernetes_io/os": [
+    "linux"
+  ],
+  "kubernetes.node.labels.beta_kubernetes_io/os.keyword": [
+    "linux"
+  ],
+  "kubernetes.node.labels.kubernetes_io/arch": [
+    "arm64"
+  ],
+  "kubernetes.node.labels.kubernetes_io/arch.keyword": [
+    "arm64"
+  ],
+  "kubernetes.node.labels.kubernetes_io/hostname": [
+    "worker-1"
+  ],
+  "kubernetes.node.labels.kubernetes_io/hostname.keyword": [
+    "worker-1"
+  ],
+  "kubernetes.node.labels.kubernetes_io/os": [
+    "linux"
+  ],
+  "kubernetes.node.labels.kubernetes_io/os.keyword": [
+    "linux"
+  ],
+  "kubernetes.node.labels.node-role_kubernetes_io/worker": [
+    "worker"
+  ],
+  "kubernetes.node.labels.node-role_kubernetes_io/worker.keyword": [
+    "worker"
+  ],
+  "kubernetes.node.name": [
+    "worker-1"
+  ],
+  "kubernetes.node.name.keyword": [
+    "worker-1"
+  ],
+  "kubernetes.node.uid": [
+    "451d36c5-56e4-4664-866c-47ebaf189372"
+  ],
+  "kubernetes.node.uid.keyword": [
+    "451d36c5-56e4-4664-866c-47ebaf189372"
+  ],
+  "kubernetes.pod.ip": [
+    "10.244.2.4"
+  ],
+  "kubernetes.pod.ip.keyword": [
+    "10.244.2.4"
+  ],
+  "kubernetes.pod.name": [
+    "python-prometheus-demo-5b45684f9-2qtsl"
+  ],
+  "kubernetes.pod.name.keyword": [
+    "python-prometheus-demo-5b45684f9-2qtsl"
+  ],
+  "kubernetes.pod.uid": [
+    "3c4bdfb5-e276-450a-bb1b-d87a721383b6"
+  ],
+  "kubernetes.pod.uid.keyword": [
+    "3c4bdfb5-e276-450a-bb1b-d87a721383b6"
+  ],
+  "kubernetes.replicaset.name": [
+    "python-prometheus-demo-5b45684f9"
+  ],
+  "kubernetes.replicaset.name.keyword": [
+    "python-prometheus-demo-5b45684f9"
+  ],
+  "log_stream": [
+    "application"
+  ],
+  "log_stream.keyword": [
+    "application"
+  ],
+  "log.file.path": [
+    "/var/log/containers/python-prometheus-demo-5b45684f9-2qtsl_prometheus-demo_python-prometheus-demo-abf945c2b1f3a6109e22f72ed409e0b4031cf756f78fac3cfe93a50e10bc60ea.log"
+  ],
+  "log.file.path.keyword": [
+    "/var/log/containers/python-prometheus-demo-5b45684f9-2qtsl_prometheus-demo_python-prometheus-demo-abf945c2b1f3a6109e22f72ed409e0b4031cf756f78fac3cfe93a50e10bc60ea.log"
+  ],
+  "log.level": [
+    "INFO"
+  ],
+  "log.level.keyword": [
+    "INFO"
+  ],
+  "log.offset": [
+    188750
+  ],
+  "message": [
+    "{\"app\": \"python-prometheus-demo\", \"module\": \"main\", \"level\": \"INFO\", \"ts\": \"2026-03-01T13:04:27Z\", \"event\": \"loop_tick\", \"max_run\": \"unlimited\", \"current_run\": 32004, \"pct_complete\": \"n/a\", \"total_execution_time_s\": 166890.38, \"loop_execution_time_s\": 4.63, \"sleep_s\": 4.63, \"random_number\": 2}"
+  ],
+  "message.keyword": [
+    "{\"app\": \"python-prometheus-demo\", \"module\": \"main\", \"level\": \"INFO\", \"ts\": \"2026-03-01T13:04:27Z\", \"event\": \"loop_tick\", \"max_run\": \"unlimited\", \"current_run\": 32004, \"pct_complete\": \"n/a\", \"total_execution_time_s\": 166890.38, \"loop_execution_time_s\": 4.63, \"sleep_s\": 4.63, \"random_number\": 2}"
+  ],
+  "module": [
+    "main"
+  ],
+  "module.keyword": [
+    "main"
+  ],
+  "stream": [
+    "stdout"
+  ],
+  "stream.keyword": [
+    "stdout"
+  ],
+  "tags": [
+    "python-prometheus-demo"
+  ],
+  "tags.keyword": [
+    "python-prometheus-demo"
+  ],
+  "_id": "TiKAqZwBDwfRH4XVQoR7",
+  "_index": "filebeat-python-prometheus-demo-2026.03.01",
+  "_score": null
+}
