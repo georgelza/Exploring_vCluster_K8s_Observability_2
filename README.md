@@ -154,7 +154,7 @@ A pretty complete, locally hosted development environment for any developer.
 
 - [Elasticsearch](https://www.elastic.co/)
 - [Kibana](https://www.elastic.co/kibana)
-
+- [Filebeat](https://www.elastic.co/beats/filebeat)
 - [Prometheus](https://prometheus.io)
 - [Grafana](https://grafana.com)
 - [Thanos](https://thanos.io)
