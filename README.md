@@ -67,6 +67,8 @@ Filebeat                    Filebeat is a lightweight, open-source log shipper w
                             high-volume, real-time data ingestion while ensuring log continuity.
 ```
 
+Note, This is not a ElasticSearch/Kibana/Filebeat How To/Tutorial. As such I will not be going into deep detail about the specific settings and their configurations.
+
 <img src="blog-doc/diagrams/SuperLabv4.1.png" alt="Our Build- Part 2" width="600" height="700">
 
 ### Three Demo Applications
@@ -134,6 +136,43 @@ For the complete step-by-step walkthrough, start with  `loganalytics/README.md`.
   
 See `mv-vc1/*` for screengrabs of each step executed and terminal output.
 
+Regarding the Log Analytics/Filebeat deployment.
+
+This part of the deployment and the settings in filebeat-config-full.yaml is critical, and took some time to figure out to make sure filebeat read the data correctly and then submitted to elasticsearch correctly,
+
+Pay attention to the contains and the kubnernetes.pod.names, condition / lines 88-90
+These define which log entries to include into our output to be tagged using the tag: [“pythong-prometheus-demo”]
+
+```yaml
+  - condition:
+      contains:
+        kubernetes.pod.name: "python-prometheus-demo"                  
+    config:
+      - type: container
+        paths:
+          - /var/log/containers/*${data.kubernetes.container.id}.log
+        tags: ["python-prometheus-demo"]
+```
+
+We additionally also have a generic, catch all rule, which catches all log entries that don match our above rule, lines 233-244
+
+```yaml
+    # ── Catch-all: every pod NOT matched above ──────────────────────
+    # Logs land in filebeat-generic-* without JSON parsing.
+    # This ensures no pod logs are silently dropped.
+    - condition:
+        and:
+          - not:
+              contains:
+                kubernetes.pod.name: "python-prometheus-demo"
+```
+
+Also the 2 specific settings in the output.elasticsearch section, see, line 268-271.
+
+```yaml
+    setup.template.enabled: false
+    setup.ilm.enabled: false
+```
 
 ## Summary / Conclusion
 

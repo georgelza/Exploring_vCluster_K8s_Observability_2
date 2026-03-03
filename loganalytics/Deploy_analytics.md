@@ -78,11 +78,68 @@ cd loganalytics/1.elasticsearch
 kubectl apply -f 1.logging-storage.yaml
 kubectl apply -f 2.elasticsearch.yaml
 kubectl rollout status deployment/elasticsearch -n logging --timeout=180s 
+# Wait for stack to be READY 1/1
 kubectl apply -f 3.kibana.yaml
 kubectl get all -n logging -o wide
 ```
 
-2. Deploy Various Demo Prometheus metric generating apps, see loganalytics/2.Apps
+
+2. Deploy loganalytics/3.elk-app-integration
+
+This part of the filebeat-config is critical, and took some time to figure out to make sure filebeat read the data correctly and then submitted to elasticsearch correctly,
+
+Pay attention to the pod names / condition / *lines 88-90*
+
+```yaml
+    - condition:
+        contains:
+            kubernetes.pod.name: "python-prometheus-demo"                  
+        config:
+        - type: container
+            paths:
+            - /var/log/containers/*${data.kubernetes.container.id}.log
+            tags: ["python-prometheus-demo"]
+```
+and our catch all *lines 233-244*
+
+```yaml
+    - condition:
+        and:
+            - not:
+                contains:
+                kubernetes.pod.name: "python-prometheus-demo"
+
+```
+Also the 2 specific settings in the output.elasticsearch section, see, l*ine 268-271*.
+
+```yaml
+    setup.template.enabled: false
+    setup.ilm.enabled: false
+```
+
+```bash
+cd loganalytics/3.elk-app-integration
+kubectl apply -f .
+kubectl get all -n logging -o wide
+```
+
+1. Deploy loganalytics/4.traefik-ingress
+
+```bash
+cd loganalytics/4.traefik-ingress
+kubectl apply -f .
+kubectl get all -n logging -o wide
+```
+
+4. Deploy loganalytics/5.kibana
+
+```bash
+cd loganalytics/5.kibana
+kubectl apply -f .
+kubectl get all -n logging -o wide
+```
+
+5. Deploy Various Demo Prometheus metric generating apps, see loganalytics/2.Apps
 
 Note, these are direct copies from our previous blog where it was contained in monitoring/7.Apps
 
@@ -111,31 +168,6 @@ make k-apply
 ```bash
 kubectl get all -n prometheus-demo -o wide
 ```
-
-3. Deploy loganalytics/3.elk-app-integration
-
-```bash
-cd loganalytics/3.elk-app-integration
-kubectl apply -f .
-kubectl get all -n logging -o wide
-```
-
-4. Deploy loganalytics/4.traefik-ingress
-
-```bash
-cd loganalytics/4.traefik-ingress
-kubectl apply -f .
-kubectl get all -n logging -o wide
-```
-
-4. Deploy loganalytics/5.kibana
-
-```bash
-cd loganalytics/5.kibana
-kubectl apply -f .
-kubectl get all -n logging -o wide
-```
-
 
 ## Example Grafana Dashboards
 
