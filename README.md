@@ -12,7 +12,7 @@ In this two-part series, we’ll deploy a complete observability stack on a loca
 
 - Part 2 (this post): Adding log analytics with [ElasticSearch](https://www.elastic.co)
 
-In our previous edition we built the monitoring stack of our environment, also commonly referred to as the metrics collection component of an Observability stack, but a Observability is the combination of metrics and log, so here we are, lets see whats involved to deploy an Log Analytics based on Elastsearch.
+In our previous edition we built the monitoring stack of our environment, also commonly referred to as the metrics collection component of an Observability stack, but a Observability is the combination of metrics and log, so here we are, lets see whats involved to deploy an Log Analytics based on [ElasticSearch](https://www.elastic.co).
 
 
 All source code is available at [georgelza/Exploring_vCluster_K8s_Observability_2](https://github.com/georgelza/Exploring_vCluster_K8s_Observability_2.git).
@@ -58,9 +58,9 @@ Elasticsearch               Elasticsearch is a distributed search and analytics 
                             and operational intelligence use cases.
 
 Kibana                      Kibana is the open-source data visualization and exploration user interface for the 
-                            Elastic Stack (Elasticsearch). It enables users to visualize data with charts, graphs, and maps, 
-                            as well as manage, monitor, and secure the Elastic Stack. It is commonly used for log analysis, 
-                            time-series analytics, and operational intelligence.
+                            Elastic Stack (Elasticsearch). It enables users to visualize data with charts, graphs, and maps, as well as manage, monitor, and secure the Elastic Stack. 
+                            It is commonly used for log analysis, time-series analytics, and operational intelligence.
+
 Filebeat                    Filebeat is a lightweight, open-source log shipper within the Elastic Stack (ELK) that 
                             monitors, collects, and forwards log files from servers to Elasticsearch or Logstash. 
                             Installed as an agent, it is designed for low resource consumption, handling 
@@ -89,7 +89,6 @@ The little surprise, what we did not mention at the time was that these example 
   "max_run": "unlimited"
 }
 ```
-
 
 
 ## The Bigger Picture
@@ -138,10 +137,10 @@ See `mv-vc1/*` for screengrabs of each step executed and terminal output.
 
 Regarding the Log Analytics/Filebeat deployment.
 
-This part of the deployment and the settings in filebeat-config-full.yaml is critical, and took some time to figure out to make sure filebeat read the data correctly and then submitted to elasticsearch correctly,
+This part of the deployment and the settings in `filebeat-config-full.yaml` is critical, and took some time to figure out to make sure filebeat read the data correctly and then submitted to elasticsearch correctly,
 
-Pay attention to the contains and the kubnernetes.pod.names, condition / lines 88-90
-These define which log entries to include into our output to be tagged using the tag: [“pythong-prometheus-demo”]
+Pay attention to the contains and the kubnernetes.pod.names, condition / *lines 88-90*
+These define which log entries to include into our output to be tagged using the `tag`: [“pythong-prometheus-demo”]
 
 ```yaml
   - condition:
@@ -154,7 +153,7 @@ These define which log entries to include into our output to be tagged using the
         tags: ["python-prometheus-demo"]
 ```
 
-We additionally also have a generic, catch all rule, which catches all log entries that don match our above rule, lines 233-244
+We additionally also have a generic, catch all rule, which catches all log entries that don match our above rule, *lines 233-244*
 
 ```yaml
     # ── Catch-all: every pod NOT matched above ──────────────────────
@@ -167,7 +166,7 @@ We additionally also have a generic, catch all rule, which catches all log entri
                 kubernetes.pod.name: "python-prometheus-demo"
 ```
 
-Also the 2 specific settings in the output.elasticsearch section, see, line 268-271.
+Also the 2 specific settings in the output.elasticsearch section, see: *line 268-271*.
 
 ```yaml
     setup.template.enabled: false
